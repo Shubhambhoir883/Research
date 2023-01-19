@@ -1,0 +1,136 @@
+##practical 1 ##
+## from excel ##
+import pandas as pd
+Data = pd.read_excel("/content/sample_data/Book1.xlsx")
+display(pd.DataFrame(Data))
+
+####from csv file ####
+import pandas as pd 
+data2 = pd.read_csv("/content/sample_data/Book1.csv")
+display(pd.DataFrame(data2))
+
+## from sqlite ##
+import sqlite3 as sq 
+import pandas as pd
+Base='C:/VKHCG'
+sDatabaseName=Base + '/01-Vermeulen/00-RawData/SQLite/vermeulen.db' 
+conn = sq.connect(sDatabaseName) 
+sFileName='C:/VKHCG/01-Vermeulen/01-Retrieve/01-EDS/02-Python/Retrieve_IP_DATA.csv' 
+print('Loading :',sFileName) 
+IP_DATA_ALL_FIX=pd.read_csv(sFileName,header=0,low_memory=False) 
+IP_DATA_ALL_FIX.index.names = ['RowIDCSV']
+sTable='IP_DATA_ALL'
+print('Storing :',sDatabaseName,' Table:',sTable) 
+IP_DATA_ALL_FIX.to_sql(sTable, conn, if_exists="replace") 
+print('Loading :',sDatabaseName,' Table:',sTable) 
+TestData= pd.read_sql_query("select * from IP_DATA_ALL;", conn) 
+print('################')
+print('## Data Values') 
+print('################')
+print(TestData) 
+print('################')
+print('## Data Profile') 
+print('################')
+print('Rows :',TestData.shape[0]) 
+print('Columns :',TestData.shape[1]) 
+print('################')
+print('### Done!! ############################################')
+
+##practical 3#
+# (A) Perform testing of hypothesis using one sample t-test #
+from scipy.stats import ttest_1samp 
+import numpy as np
+ages = np.genfromtxt('/content/sample_data/ages.csv') 
+print(ages)
+ages_mean = np.mean(ages) 
+print(ages_mean)
+tset, pval = ttest_1samp(ages, 30) 
+print('p-values - ',pval)
+if pval< 0.05: # alpha value is 0.05
+  print(" we are rejecting null hypothesis")
+else:
+  print("we are accepting null hypothesis")
+
+# (B) Perform testing of hypothesis using paired t-test.
+from scipy import stats
+import matplotlib.pyplot as plt 
+import pandas as pd
+df = pd.read_csv("/content/sample_data/P5.csv")
+print(df[['bp_before','bp_after']].describe())
+df[['bp_before', 'bp_after']].plot(kind='box') 
+plt.savefig('boxplot_outliers.png')
+df['bp_difference'] = df['bp_before'] - df['bp_after']
+df['bp_difference'].plot(kind='hist', title= 'Blood Pressure Difference Histogram') 
+plt.savefig('blood pressure difference histogram.png') 
+stats.probplot(df['bp_difference'], plot= plt) 
+plt.title('Blood pressure Difference Q-Q Plot') 
+plt.savefig('blood pressure difference qq plot.png') 
+stats.shapiro(df['bp_difference']) 
+stats.ttest_rel(df['bp_before'], df['bp_after'])
+
+#practical 5 #
+#HYPOTHESIS TESTING USING Z-TEST#
+from statsmodels.stats import weightstats as stests 
+import pandas as pd
+from scipy import stats
+df = pd.read_csv("/content/sample_data/P5.csv") 
+df[['bp_before','bp_after']].describe() 
+print(df)
+ztest ,pval = stests.ztest(df['bp_before'], x2=None, value=156) 
+print(float(pval))
+if pval<0.05:
+  print("reject null hypothesis") 
+else:
+  print("accept null hypothesis")
+
+## TWO SAMPLE Z TEST, HYPOTHESIS TEST ##
+import pandas as pd
+from statsmodels.stats import weightstats as stests 
+df = pd.read_csv("/content/sample_data/P5.csv") 
+df[['bp_before','bp_after']].describe()
+print(df)
+ztest ,pval = stests.ztest(df['bp_before'], x2=df['bp_after'], value=0, alternative='two-sided')
+print(float(pval))
+if pval<0.05:
+  print("reject null hypothesis") 
+else:
+  print("accept null hypothesis")
+
+
+##PRACTICAL 8##
+## WRITE A PROGRAM FOR COMPUTING DIFFERENT CORRELATION##
+
+#positive correction
+import matplotlib
+import numpy as np 
+import matplotlib.pyplot as plt 
+np.random.seed(1)
+x = np.random.randint(0, 50, 1000)
+y = x + np.random.normal(0, 10, 1000)
+np.corrcoef(x, y) 
+matplotlib.style.use('ggplot')
+plt.scatter(x, y)
+plt.show()
+
+#negative correction
+import numpy as np 
+import matplotlib.pyplot as plt
+np.random.seed(1)
+#1000 random integers between 0 and 50
+x = np.random.randint(0, 50, 1000)
+# Negative Correlation with some noise
+y = 100 - x + np.random.normal(0, 5, 1000)
+np.corrcoef(x, y) 
+plt.scatter(x, y) 
+plt.show()
+
+#no/weak correction
+import numpy as np 
+import matplotlib.pyplot as plt 
+np.random.seed(1)
+x = np.random.randint(0, 50, 1000)
+y = np.random.randint(0, 50, 1000)
+np.corrcoef(x, y)
+plt.scatter(x, y)
+plt.show()
+
